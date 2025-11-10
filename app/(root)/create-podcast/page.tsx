@@ -41,11 +41,11 @@ const formSchema = z.object({
 
 const CreatePodcast = () => {
   const [imagePrompt, setImagePrompt] = useState('')
-  const [imageStorageId, setImageStorageId] = useState<Id<"_storage"> | null>(null )
+  const [imageStorageId, setImageStorageId] = useState<Id<"storage"> | null>(null)
   const [imageUrl, setImageUrl] = useState('')
 
   const [audioUrl, setAudioUrl] = useState('')
-  const [audioStorageId, setAudioStorageId] = useState<Id<"_storage"> | null>(null )
+  const [audioStorageId, setAudioStorageId] = useState<Id<"storage"> | null>(null)
   const [audioDuration, setAudioDuration] = useState(0)
 
   const [voicePrompt, setVoicePrompt] = useState('')
@@ -59,7 +59,7 @@ const CreatePodcast = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      podcastTitle : "",
+      podcastTitle: "",
       podcastDescription: "",
     },
   })
@@ -135,38 +135,38 @@ const CreatePodcast = () => {
 
           <div className="flex flex-col pt-10">
             <GeneratePodcast
-            setAudioStorageId={setAudioStorageId}
-            setAudio={setAudioUrl}
-            voiceType={voiceType!}
-            audio={audioUrl}
-            voicePrompt={voicePrompt}
-            setVoicePrompt={setVoicePrompt}
-            setAudioDuration={setAudioDuration}
-             />
+              setAudioStorageId={setAudioStorageId}
+              setAudio={setAudioUrl}
+              voiceType={voiceType!}
+              audio={audioUrl}
+              voicePrompt={voicePrompt}
+              setVoicePrompt={setVoicePrompt}
+              setAudioDuration={setAudioDuration}
+            />
 
-            <GenerateThumbnail 
-             setImage = {setImageUrl}
-             setImageStorageId = {setImageStorageId}
-             image={imageUrl}
-             imagePrompt={imagePrompt}
-             setImagePrompt={setImagePrompt}
+            <GenerateThumbnail
+              setImage={setImageUrl}
+              setImageStorageId={setImageStorageId}
+              image={imageUrl}
+              imagePrompt={imagePrompt}
+              setImagePrompt={setImagePrompt}
             />
             <div className="mt-10 w-full text-white-1">
               <Button
                 type="submit"
                 className="w-full bg-orange-1 text-white-1 text-16 font-extrabold py-4 transition-all duration-500 hover:bg-black-1"
               >
-                {isSubmitting ?(
+                {isSubmitting ? (
                   <>
                     Creating
-                  <Loader size={20} className="animate-spin ml-2" />
+                    <Loader size={20} className="animate-spin ml-2" />
                   </>
                 ) : (
                   <>
-                  Create & Publish
+                    Create & Publish
                   </>
                 )}
-              
+
               </Button>
             </div>
 

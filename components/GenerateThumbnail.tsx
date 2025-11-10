@@ -1,6 +1,5 @@
-import React, { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from './ui/button'
-import { useState } from 'react'
 import { cn } from '../lib/utils'
 import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
@@ -9,6 +8,10 @@ import { Loader } from 'lucide-react'
 import { Input } from './ui/input'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import { useAction, useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { useUploadFiles } from '@xixixao/uploadstuff/react'
+import { v4 as uuidv4 } from 'uuid'
 
 const GenerateThumbnail = ({
   setImage,
@@ -17,149 +20,154 @@ const GenerateThumbnail = ({
   imagePrompt,
   setImagePrompt,
 
-} : GenerateThumbnailProps) => {
+}: GenerateThumbnailProps) => {
   const [isAiThumbnail, setIsAiThumbnail] = useState(false)
   const [isImageLoading, setIsImageLoading] = useState(false)
-  
-  
   const imageRef = useRef<HTMLInputElement>(null)
+  const generateUploadUrl = useMutation(api.file.generateUploadUrl);
+  const { startUpload } = useUploadFiles(generateUploadUrl)
+  const getImageUrl = useMutation(api.podcasts.getUrl)
+  const handleGenerateThumbnail = useAction(api.openai.generateThumbnailAction)
 
-  const handleImage = async (blob: Blob , fileName : string) => {
-    setIsImageLoading(true)
-    setImage('')
+  const handleImage = async (blob: Blob, fileName: string) => {
+    setIsImageLoading(true);
+    setImage('');
 
     try {
-      
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      const uploaded = await startUpload([file]);
+      const storageId = (uploaded[0].response as any).storageId;
+
+      console.log('Storage ID from upload:', storageId);
+      setImageStorageId(storageId);
+
+      const imageUrl = await getImageUrl({ storageId });
+      console.log('URL from getUrl:', imageUrl);
+
+      setImage(imageUrl!);
+      setIsImageLoading(false);
+      toast("Thumbnail generated successfully")
     } catch (error) {
       console.log(error)
-      toast({
-        title : "Error",
-        description : "Error uploading image",
-        type : "error"
-      })
-      setIsImageLoading(false)
+      toast('Error generating thumbnail')
     }
   }
-  const generateImage = async ()=>{}
-  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {}
 
-  const GenerateThumbnail = async () => {
+  const generateImage = async () => {
+    try {
+      const response = await handleGenerateThumbnail({ prompt: imagePrompt });
+      const blob = new Blob([response], { type: 'image/png' });
+      handleImage(blob, `thumbnail-${uuidv4()}`);
+    } catch (error) {
+      console.log(error)
+      toast('Error generating thumbnail')
+    }
+  }
 
+  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    try {
+      const files = e.target.files;
+      if (!files) return;
+      const file = files[0];
+      const blob = await file.arrayBuffer()
+        .then((ab) => new Blob([ab]));
+
+      handleImage(blob, file.name);
+    } catch (error) {
+      console.log(error)
+      toast('Error uploading image')
+    }
   }
 
   return (
     <>
-      <div className='generate_thumbnail'>
+      <div className="generate_thumbnail">
         <Button
-          type='button'
-          variant='plain'
+          type="button"
+          variant="plain"
           onClick={() => setIsAiThumbnail(true)}
           className={cn('', {
             'bg-black-6': isAiThumbnail
           })}
-        > Use AI to generate thumbnail
+        >
+          Use AI to generate thumbnail
         </Button>
         <Button
-          type='button'
-          variant='plain'
+          type="button"
+          variant="plain"
           onClick={() => setIsAiThumbnail(false)}
           className={cn('', {
             'bg-black-6': !isAiThumbnail
           })}
-        > Upload Custom Image
+        >
+          Upload custom image
         </Button>
       </div>
-
       {isAiThumbnail ? (
-        <div className='flex flex-col gap-5 mt-5 '>
-          <div className='flex flex-col gap-2.5'>
-            <Label className='text-16 font-bold text-white-1'>
-              AI Prompt to Generate Thumbnail
+        <div className="flex flex-col gap-5">
+          <div className="mt-5 flex flex-col gap-2.5">
+            <Label className="text-16 font-bold text-white-1">
+              AI Prompt to generate Thumbnail
             </Label>
-
             <Textarea
-              className=' input-class focus:ring-offset-orange-1'
+              className="input-class font-light focus-visible:ring-offset-orange-1"
               placeholder='Provide text to generate thumbnail'
               rows={5}
               value={imagePrompt}
               onChange={(e) => setImagePrompt(e.target.value)}
             />
           </div>
-          <div className='w-full max-w-[200px] text-white-1 text-1 font-bold'>
-            <Button
-              type="submit"
-              className=" bg-orange-1 text-white-1 text-16 font-bold py-4"
-              onClick={GenerateThumbnail}
-              disabled={isImageLoading}
-            >
+          <div className="w-full max-w-[200px]">
+            <Button type="submit" className="text-16 bg-orange-1 py-4 font-bold text-white-1" onClick={generateImage}>
               {isImageLoading ? (
                 <>
                   Generating
                   <Loader size={20} className="animate-spin ml-2" />
                 </>
               ) : (
-                <>
-                  Generate
-                </>
+                'Generate'
               )}
             </Button>
           </div>
         </div>
       ) : (
-        <div className='image_div'
-          onClick={() => imageRef?.current?.click()}
-        >
-          <Input 
-            type='file'
-            className='hidden'
-            ref = {imageRef}
-            onChange={(e) => {uploadImage(e)}}
+        <div className="image_div" onClick={() => imageRef?.current?.click()}>
+          <Input
+            type="file"
+            className="hidden"
+            ref={imageRef}
+            onChange={(e) => uploadImage(e)}
           />
           {!isImageLoading ? (
-            <Image
-              src="/icons/upload-image.svg" 
-              width={40}
-              height={40}
-              alt='upload image'
-            />
+            <Image src="/icons/upload-image.svg" width={40} height={40} alt="upload" />
           ) : (
-            <div className='text-16 flex-center font-medium text-white-1'>
+            <div className="text-16 flex-center font-medium text-white-1">
               Uploading
               <Loader size={20} className="animate-spin ml-2" />
             </div>
           )}
-
-          <div className='flex flex-col flex-center gap-1'>
-            <h2 className='text-12 text-orange-1 font-bold'>Click to Upload</h2>
-            <p className='text-12 font-normal text-gray-1'>SVG, PNG, JPEG or a GIF (max 1080 x 1080p)</p>
+          <div className="flex flex-col items-center gap-1">
+            <h2 className="text-12 font-bold text-orange-1">
+              Click to upload
+            </h2>
+            <p className="text-12 font-normal text-gray-1">SVG, PNG, JPG, or GIF (max. 1080x1080px)</p>
           </div>
-
         </div>
       )}
       {image && (
-        <div className='flex-center w-full'>
-          <Image 
+        <div className="flex-center w-full">
+          <Image
             src={image}
             width={200}
             height={200}
-            className='mt-5'
-            alt='thumbnail'
+            className="mt-5"
+            alt="thumbnail"
           />
         </div>
-        )}
-
-        {image && (
-          <div className='flex-center w-full'>
-            <Image 
-              src={image}
-              height={200}
-              width={200}
-              className='mt-5'
-              alt='thumbnail'
-            />
-          </div>  
-        )
-        }
+      )}
     </>
   )
 }
