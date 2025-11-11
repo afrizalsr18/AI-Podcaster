@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'good-squid-335.convex.cloud'
+      },
+      {
+        protocol: 'https',
+        hostname: 'lovely-flamingo-139.convex.cloud'
       }
     ]
   },

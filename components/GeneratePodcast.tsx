@@ -29,14 +29,14 @@ const useGeneratePodcast = ({
     setAudio('');
 
     if (!voicePrompt) {
-      toast("Provide voiceTyype to generate podcast")
+      toast("Provide voiceType to generate podcast")
       return setIsGenerating(false)
     }
 
     try {
       const response = await getPodcastAudio({
         input: voicePrompt,
-        voice: voiceType
+        voice: voiceType.toLowerCase(),
       })
 
       const blob = new Blob([response], { type: 'audio/mpeg' })
