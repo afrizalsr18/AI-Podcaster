@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { api } from "@/convex/_generated/api"
 
 import {
   Form,
@@ -30,6 +31,9 @@ import GenerateThumbnail from "@/components/GenerateThumbnail"
 import { Button } from "@/components/ui/button"
 import { Loader } from "lucide-react"
 import { Id } from "@/convex/_generated/dataModel"
+import { useMutation } from "convex/react"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   podcastTitle: z.string().min(2),
@@ -37,15 +41,14 @@ const formSchema = z.object({
 
 })
 
-
-
 const CreatePodcast = () => {
+  const router = useRouter()
   const [imagePrompt, setImagePrompt] = useState('')
-  const [imageStorageId, setImageStorageId] = useState<Id<"storage"> | null>(null)
+  const [imageStorageId, setImageStorageId] = useState<Id<"_storage"> | null>(null)
   const [imageUrl, setImageUrl] = useState('')
 
   const [audioUrl, setAudioUrl] = useState('')
-  const [audioStorageId, setAudioStorageId] = useState<Id<"storage"> | null>(null)
+  const [audioStorageId, setAudioStorageId] = useState<Id<"_storage"> | null>(null)
   const [audioDuration, setAudioDuration] = useState(0)
 
   const [voicePrompt, setVoicePrompt] = useState('')
@@ -53,8 +56,7 @@ const CreatePodcast = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-
-
+  const createPodcast = useMutation(api.podcasts.createPodcast)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,12 +67,38 @@ const CreatePodcast = () => {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      setIsSubmitting(true)
+      if (!audioUrl || !imageUrl || !voiceType) {
+        toast("Please generate audio and image before submitting")
+        setIsSubmitting(false)
+        throw new Error("Missing audio or image")
+      }
+      const podcast = await createPodcast({
+        podcastTitle: data.podcastTitle,
+        podcastDescription: data.podcastDescription,
+        audioUrl,
+        imageUrl,
+        voiceType,
+        voicePrompt,
+        imagePrompt,
+        views: 0,
+        audioDuration,
+        audioStorageId: audioStorageId!,
+        imageStorageId: imageStorageId!,
+      })
+      toast("podcast created successfully")
+      setIsSubmitting(false)
+      router.push('/')
+    } catch (error) {
+      console.log(error)
+      toast("error creating podcast")
+    }
   }
 
   const VoiceCategories = [
-    'Alloy', 'Shimmer', 'Nova', 'Echo', 'Vortex', 'Pulse', 'Siren', 'Vivid', 'Lumin']
+    'nova', 'shimmer', 'echo', 'onyx', 'fable', 'alloy', 'ash', 'sage', 'coral']
 
 
   return (
