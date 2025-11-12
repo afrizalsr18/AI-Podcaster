@@ -106,7 +106,7 @@ export interface AudioContextType {
 }
 
 export interface PodcastCardProps {
-  imgUrl: string;
+  imgUrl: string | null | undefined;
   title: string;
   description: string;
   podcastId: Id<"podcasts">;
