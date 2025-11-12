@@ -15,8 +15,6 @@ const Home = () => {
       <section className='flex flex-col gap-5'>
         <h1 className='text-20 font-bold text-white-1'>Trending Podcast</h1>
 
-        
-
         <div className='podcast_grid'>
           {trendingPodcasts?.map(({
             _id,
