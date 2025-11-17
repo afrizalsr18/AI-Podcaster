@@ -33,6 +33,16 @@ export const createPodcast = mutation({
             throw new ConvexError("User not found");
         }
 
+        const podcast = await ctx.db.insert('podcasts', {
+            ...args,
+            user: user[0]._id,
+            author: user[0].name,
+            authorId: user[0].clerkId,
+            authorImageUrl: user[0].imageUrl,
+        })
+
+        return podcast;
+
         return await ctx.db.insert("podcasts", {
             audioStorageId: args.audioStorageId,
             user: user[0]._id,
