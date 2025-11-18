@@ -32,7 +32,6 @@ export default function RootLayout({
             </div>
           </div>
         </section>
-
         <RightSidebar />
       </main>
       <PodcastPlayer />
