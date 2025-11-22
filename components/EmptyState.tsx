@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Button } from './ui/button'
 import Link from 'next/link'
 
-const EmptyState = ({ title, search, buttonLink, buttonText }: EmptyStateProps) => {
+const EmptyState = ({ title, search, buttonLink }: EmptyStateProps) => {
     return (
         <section className='flex-center size-full flex-col gap-3'>
             <Image
