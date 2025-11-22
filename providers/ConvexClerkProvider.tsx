@@ -2,11 +2,21 @@
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL as string);
+const ConvexClerkProvider = ({ children } : {children: ReactNode}) => {
+  const convex = useMemo(() => {
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_CONVEX_URL environment variable. " +
+        "Set it in your .env.local file or in your deployment settings."
+      );
+    }
+    return new ConvexReactClient(convexUrl);
+  }, []);
 
-const ConvexClerkProvider = ({ children } : {children: ReactNode}) => (
+  return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY as string} appearance={{
       layout: {
         socialButtonsVariant: "iconButton",
@@ -24,6 +34,7 @@ const ConvexClerkProvider = ({ children } : {children: ReactNode}) => (
         {children}
       </ConvexProviderWithClerk>
     </ClerkProvider>
-);
+  );
+};
 
 export default ConvexClerkProvider;
