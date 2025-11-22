@@ -49,6 +49,8 @@ const PodcastDetails = ({
         {...podcast}
         audioUrl={podcast.audioUrl || ""}
         imageUrl={podcast.imageUrl || ""}
+        imageStorageId={podcast.imageStorageId ?? null}
+        audioStorageId={podcast.audioStorageId ?? null}
       />
 
       <p className="text-white-2 text-16 pb-8 pt-[45px] font-medium max-md:text-center">
