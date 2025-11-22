@@ -30,6 +30,10 @@ const PodcastDetailPlayer = ({
   const deletePodcast = useMutation(api.podcasts.deletePodcast);
 
   const handleDelete = async () => {
+    if (!imageStorageId || !audioStorageId) {
+      toast("Cannot delete podcast: missing storage IDs");
+      return;
+    }
     try {
       await deletePodcast({ podcastId, imageStorageId, audioStorageId });
       toast("Podcast deleted");
