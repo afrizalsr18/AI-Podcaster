@@ -75,8 +75,7 @@ const CreatePodcast = () => {
         setIsSubmitting(false)
         throw new Error("Missing audio or image")
       }
-      // TODO : call podcast
-      const podcast = await createPodcast({
+      await createPodcast({
         podcastTitle: data.podcastTitle,
         podcastDescription: data.podcastDescription,
         audioUrl,
