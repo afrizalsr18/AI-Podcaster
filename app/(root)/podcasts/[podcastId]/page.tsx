@@ -11,6 +11,8 @@ import { useQuery } from "convex/react";
 import Image from "next/image";
 import React, { use } from "react";
 
+export const dynamic = 'force-dynamic';
+
 const PodcastDetails = ({
   params,
 }: {

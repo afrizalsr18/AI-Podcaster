@@ -8,6 +8,8 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 const Discover = () => {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";

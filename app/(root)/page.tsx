@@ -5,6 +5,8 @@ import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import React from 'react'
 
+export const dynamic = 'force-dynamic';
+
 const Home = () => {
   
   const trendingPodcasts = useQuery(api.podcasts.getTrendingPodcasts)

@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { api } from "@/convex/_generated/api"
 
+export const dynamic = 'force-dynamic';
+
 import {
   Form,
   FormControl,
