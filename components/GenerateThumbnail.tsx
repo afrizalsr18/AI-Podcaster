@@ -10,8 +10,13 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 import { useAction, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 import { useUploadFiles } from '@xixixao/uploadstuff/react'
 import { v4 as uuidv4 } from 'uuid'
+
+interface UploadResponse {
+  storageId: Id<"_storage">;
+}
 
 const GenerateThumbnail = ({
   setImage,
@@ -37,7 +42,7 @@ const GenerateThumbnail = ({
       const file = new File([blob], fileName, { type: 'image/png' });
 
       const uploaded = await startUpload([file]);
-      const storageId = (uploaded[0].response as any).storageId;
+      const storageId = (uploaded[0].response as UploadResponse).storageId;
 
       console.log('Storage ID from upload:', storageId);
       setImageStorageId(storageId);

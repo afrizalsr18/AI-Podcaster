@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { api } from "@/convex/_generated/api"
 
+export const dynamic = 'force-dynamic';
+
 import {
   Form,
   FormControl,
@@ -75,7 +77,7 @@ const CreatePodcast = () => {
         setIsSubmitting(false)
         throw new Error("Missing audio or image")
       }
-      const podcast = await createPodcast({
+      await createPodcast({
         podcastTitle: data.podcastTitle,
         podcastDescription: data.podcastDescription,
         audioUrl,

@@ -3,7 +3,7 @@ import { EmblaCarouselType } from 'embla-carousel'
 import { DotButton, useDotButton } from './EmblaCarouselDotButton'
 import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
-import { CarouselProps } from '@/types'
+import { CarouselProps, TopPodcastersProps } from '@/types'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import LoaderSpinner from './ui/LoaderSpinner'
@@ -30,9 +30,9 @@ const EmblaCarousel = ({ fansLikeDetail }: CarouselProps) => {
     onNavButtonClick
   )
 
-  const slides = fansLikeDetail && fansLikeDetail?.filter((item: any) => item.totalPodcasts > 0)
+  const slides = fansLikeDetail && fansLikeDetail?.filter((item: TopPodcastersProps) => item.totalPodcasts > 0)
 
-  if(!slides) return <LoaderSpinner />
+  if (!slides) return <LoaderSpinner />
 
   return (
     <section className="flex w-full flex-col gap-4 overflow-hidden" ref={emblaRef}>
@@ -43,11 +43,11 @@ const EmblaCarousel = ({ fansLikeDetail }: CarouselProps) => {
             className="carousel_box"
             onClick={() => router.push(`/podcasts/${item.podcast[0]?.podcastId}`)}
           >
-            <Image 
-            src={item.imageUrl}
-            alt="card"
-            fill
-            className="absolute size-full rounded-xl border-none"
+            <Image
+              src={item.imageUrl}
+              alt="card"
+              fill
+              className="absolute size-full rounded-xl border-none"
             />
             <div className="glassmorphism-black relative z-10 flex flex-col rounded-b-xl p-4">
               <h2 className="text-14 font-semibold text-white-1">{item.podcast[0]?.podcastTitle}</h2>
@@ -62,8 +62,8 @@ const EmblaCarousel = ({ fansLikeDetail }: CarouselProps) => {
             key={index}
             onClick={() => onDotButtonClick(index)}
             selected={index === selectedIndex}
-            />
-          ))}
+          />
+        ))}
       </div>
     </section>
   )

@@ -11,6 +11,8 @@ import { useQuery } from "convex/react";
 import Image from "next/image";
 import React, { use } from "react";
 
+export const dynamic = 'force-dynamic';
+
 const PodcastDetails = ({
   params,
 }: {
@@ -49,6 +51,8 @@ const PodcastDetails = ({
         {...podcast}
         audioUrl={podcast.audioUrl || ""}
         imageUrl={podcast.imageUrl || ""}
+        imageStorageId={podcast.imageStorageId ?? null}
+        audioStorageId={podcast.audioStorageId ?? null}
       />
 
       <p className="text-white-2 text-16 pb-8 pt-[45px] font-medium max-md:text-center">
