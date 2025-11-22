@@ -9,13 +9,14 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import Image from "next/image";
-import React from "react";
+import React, { use } from "react";
 
 const PodcastDetails = ({
-  params: { podcastId },
+  params,
 }: {
-  params: { podcastId: Id<"podcasts"> };
+  params: Promise<{ podcastId: Id<"podcasts"> }>;
 }) => {
+  const { podcastId } = use(params);
   const { user } = useUser();
   const podcast = useQuery(api.podcasts.getPodcastById, { podcastId });
 
@@ -47,6 +48,7 @@ const PodcastDetails = ({
         podcastId={podcast._id}
         {...podcast}
         audioUrl={podcast.audioUrl || ""}
+        imageUrl={podcast.imageUrl || ""}
       />
 
       <p className="text-white-2 text-16 pb-8 pt-[45px] font-medium max-md:text-center">
