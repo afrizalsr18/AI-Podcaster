@@ -114,19 +114,19 @@ html {
   border: 2px solid #222429;
 }
 .cl-button {
-  color: white;
+  color: black;
 }
 .cl-socialButtonsProviderIcon__github {
   filter: invert(1);
 }
 .cl-internal-b3fm6y {
-  background: #f97535;
+  background: #00ffea;
 }
 .cl-formButtonPrimary {
-  background: #f97535;
+  background: #00ffea;
 }
 .cl-footerActionLink {
-  color: #f97535;
+  color: #00ffea;
 }
 .cl-headerSubtitle {
   color: #c5d0e6;
@@ -143,5 +143,5 @@ html {
   color: white;
 }
 .cl-internal-wkkub3 {
-  color: #f97535;
+  color: #00ffea;
 }

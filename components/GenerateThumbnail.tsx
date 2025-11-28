@@ -1,18 +1,18 @@
-import { useRef, useState } from 'react'
-import { Button } from './ui/button'
-import { cn } from '../lib/utils'
-import { Textarea } from './ui/textarea'
-import { Label } from './ui/label'
-import { GenerateThumbnailProps } from '@/types'
-import { Loader } from 'lucide-react'
-import { Input } from './ui/input'
-import Image from 'next/image'
-import { toast } from 'sonner'
-import { useAction, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { Id } from '@/convex/_generated/dataModel'
-import { useUploadFiles } from '@xixixao/uploadstuff/react'
-import { v4 as uuidv4 } from 'uuid'
+import { useRef, useState } from "react";
+import { Button } from "./ui/button";
+import { cn } from "../lib/utils";
+import { Textarea } from "./ui/textarea";
+import { Label } from "./ui/label";
+import { GenerateThumbnailProps } from "@/types";
+import { Loader } from "lucide-react";
+import { Input } from "./ui/input";
+import Image from "next/image";
+import { toast } from "sonner";
+import { useAction, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useUploadFiles } from "@xixixao/uploadstuff/react";
+import { v4 as uuidv4 } from "uuid";
 
 interface UploadResponse {
   storageId: Id<"_storage">;
@@ -24,51 +24,50 @@ const GenerateThumbnail = ({
   image,
   imagePrompt,
   setImagePrompt,
-
 }: GenerateThumbnailProps) => {
-  const [isAiThumbnail, setIsAiThumbnail] = useState(false)
-  const [isImageLoading, setIsImageLoading] = useState(false)
-  const imageRef = useRef<HTMLInputElement>(null)
+  const [isAiThumbnail, setIsAiThumbnail] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const imageRef = useRef<HTMLInputElement>(null);
   const generateUploadUrl = useMutation(api.file.generateUploadUrl);
-  const { startUpload } = useUploadFiles(generateUploadUrl)
-  const getImageUrl = useMutation(api.podcasts.getUrl)
-  const handleGenerateThumbnail = useAction(api.openai.generateThumbnailAction)
+  const { startUpload } = useUploadFiles(generateUploadUrl);
+  const getImageUrl = useMutation(api.podcasts.getUrl);
+  const handleGenerateThumbnail = useAction(api.openai.generateThumbnailAction);
 
   const handleImage = async (blob: Blob, fileName: string) => {
     setIsImageLoading(true);
-    setImage('');
+    setImage("");
 
     try {
-      const file = new File([blob], fileName, { type: 'image/png' });
+      const file = new File([blob], fileName, { type: "image/png" });
 
       const uploaded = await startUpload([file]);
       const storageId = (uploaded[0].response as UploadResponse).storageId;
 
-      console.log('Storage ID from upload:', storageId);
+      console.log("Storage ID from upload:", storageId);
       setImageStorageId(storageId);
 
       const imageUrl = await getImageUrl({ storageId });
-      console.log('URL from getUrl:', imageUrl);
+      console.log("URL from getUrl:", imageUrl);
 
       setImage(imageUrl!);
       setIsImageLoading(false);
-      toast("Thumbnail generated successfully")
+      toast("Thumbnail generated successfully");
     } catch (error) {
-      console.log(error)
-      toast('Error generating thumbnail')
+      console.log(error);
+      toast("Error generating thumbnail");
     }
-  }
+  };
 
   const generateImage = async () => {
     try {
       const response = await handleGenerateThumbnail({ prompt: imagePrompt });
-      const blob = new Blob([response], { type: 'image/png' });
+      const blob = new Blob([response], { type: "image/png" });
       handleImage(blob, `thumbnail-${uuidv4()}`);
     } catch (error) {
-      console.log(error)
-      toast('Error generating thumbnail')
+      console.log(error);
+      toast("Error generating thumbnail");
     }
-  }
+  };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -77,15 +76,14 @@ const GenerateThumbnail = ({
       const files = e.target.files;
       if (!files) return;
       const file = files[0];
-      const blob = await file.arrayBuffer()
-        .then((ab) => new Blob([ab]));
+      const blob = await file.arrayBuffer().then((ab) => new Blob([ab]));
 
       handleImage(blob, file.name);
     } catch (error) {
-      console.log(error)
-      toast('Error uploading image')
+      console.log(error);
+      toast("Error uploading image");
     }
-  }
+  };
 
   return (
     <>
@@ -94,8 +92,8 @@ const GenerateThumbnail = ({
           type="button"
           variant="plain"
           onClick={() => setIsAiThumbnail(true)}
-          className={cn('', {
-            'bg-black-6': isAiThumbnail
+          className={cn("", {
+            "bg-black-6": isAiThumbnail,
           })}
         >
           Use AI to generate thumbnail
@@ -104,8 +102,8 @@ const GenerateThumbnail = ({
           type="button"
           variant="plain"
           onClick={() => setIsAiThumbnail(false)}
-          className={cn('', {
-            'bg-black-6': !isAiThumbnail
+          className={cn("", {
+            "bg-black-6": !isAiThumbnail,
           })}
         >
           Upload custom image
@@ -119,21 +117,25 @@ const GenerateThumbnail = ({
             </Label>
             <Textarea
               className="input-class font-light focus-visible:ring-offset-orange-1"
-              placeholder='Provide text to generate thumbnail'
+              placeholder="Provide text to generate thumbnail"
               rows={5}
               value={imagePrompt}
               onChange={(e) => setImagePrompt(e.target.value)}
             />
           </div>
           <div className="w-full max-w-[200px]">
-            <Button type="submit" className="text-16 bg-orange-1 py-4 font-bold text-white-1" onClick={generateImage}>
+            <Button
+              type="submit"
+              className="text-16 bg-orange-1 py-4 font-bold text-black-1"
+              onClick={generateImage}
+            >
               {isImageLoading ? (
                 <>
                   Generating
                   <Loader size={20} className="animate-spin ml-2" />
                 </>
               ) : (
-                'Generate'
+                "Generate"
               )}
             </Button>
           </div>
@@ -147,7 +149,12 @@ const GenerateThumbnail = ({
             onChange={(e) => uploadImage(e)}
           />
           {!isImageLoading ? (
-            <Image src="/icons/upload-image.svg" width={40} height={40} alt="upload" />
+            <Image
+              src="/icons/upload-image.svg"
+              width={40}
+              height={40}
+              alt="upload"
+            />
           ) : (
             <div className="text-16 flex-center font-medium text-white-1">
               Uploading
@@ -155,10 +162,10 @@ const GenerateThumbnail = ({
             </div>
           )}
           <div className="flex flex-col items-center gap-1">
-            <h2 className="text-12 font-bold text-orange-1">
-              Click to upload
-            </h2>
-            <p className="text-12 font-normal text-gray-1">SVG, PNG, JPG, or GIF (max. 1080x1080px)</p>
+            <h2 className="text-12 font-bold text-orange-1">Click to upload</h2>
+            <p className="text-12 font-normal text-gray-1">
+              SVG, PNG, JPG, or GIF (max. 1080x1080px)
+            </p>
           </div>
         </div>
       )}
@@ -174,7 +181,7 @@ const GenerateThumbnail = ({
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default GenerateThumbnail
+export default GenerateThumbnail;

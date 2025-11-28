@@ -1,102 +1,100 @@
-import { GeneratePodcastProps } from '@/types'
-import React from 'react'
-import { Label } from './ui/label'
-import { Textarea } from './ui/textarea'
-import { Button } from './ui/button'
-import { Loader } from 'lucide-react'
-import { useState } from 'react'
-import { useAction, useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { Id } from '@/convex/_generated/dataModel'
-import { v4 as uuidv4 } from 'uuid'
-import { useUploadFiles } from '@xixixao/uploadstuff/react';
-import { toast } from "sonner"
+import { GeneratePodcastProps } from "@/types";
+import React from "react";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
+import { Loader } from "lucide-react";
+import { useState } from "react";
+import { useAction, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { v4 as uuidv4 } from "uuid";
+import { useUploadFiles } from "@xixixao/uploadstuff/react";
+import { toast } from "sonner";
 
 interface UploadResponse {
   storageId: Id<"_storage">;
 }
 
 const useGeneratePodcast = ({
-  setAudio, voiceType, voicePrompt, setAudioStorageId
+  setAudio,
+  voiceType,
+  voicePrompt,
+  setAudioStorageId,
 }: GeneratePodcastProps) => {
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateUploadUrl = useMutation(api.file.generateUploadUrl)
-  const getPodcastAudio = useAction(api.openai.generateAudioAction)
+  const generateUploadUrl = useMutation(api.file.generateUploadUrl);
+  const getPodcastAudio = useAction(api.openai.generateAudioAction);
 
-  const { startUpload } = useUploadFiles(generateUploadUrl)
+  const { startUpload } = useUploadFiles(generateUploadUrl);
 
-  const getAudioUrl = useMutation(api.podcasts.getUrl)
+  const getAudioUrl = useMutation(api.podcasts.getUrl);
 
   const generatePodcast = async () => {
-    setIsGenerating(true)
-    setAudio('');
+    setIsGenerating(true);
+    setAudio("");
 
     if (!voicePrompt) {
-      toast("Provide voiceType to generate podcast")
-      return setIsGenerating(false)
+      toast("Provide voiceType to generate podcast");
+      return setIsGenerating(false);
     }
 
     try {
       const response = await getPodcastAudio({
         input: voicePrompt,
         voice: voiceType.toLowerCase(),
-      })
+      });
 
-      const blob = new Blob([response], { type: 'audio/mpeg' })
+      const blob = new Blob([response], { type: "audio/mpeg" });
       const fileName = `podcast-${uuidv4}.mp3`;
-      const file = new File([blob], fileName, { type: 'audio/mpeg' })
+      const file = new File([blob], fileName, { type: "audio/mpeg" });
 
-      const uploaded = await startUpload([file])
+      const uploaded = await startUpload([file]);
       const storageId = (uploaded[0].response as UploadResponse).storageId;
 
-      setAudioStorageId(storageId)
+      setAudioStorageId(storageId);
 
-      const audioUrl = await getAudioUrl({ storageId })
-      setAudio(audioUrl!)
-      setIsGenerating(false)
-      toast("Podcast generated successfully")
-
-
+      const audioUrl = await getAudioUrl({ storageId });
+      setAudio(audioUrl!);
+      setIsGenerating(false);
+      toast("Podcast generated successfully");
     } catch (error) {
-      console.log("error generating podcast", error)
-      toast("Error generating podcast")
-      setIsGenerating(false)
+      console.log("error generating podcast", error);
+      toast("Error generating podcast");
+      setIsGenerating(false);
     }
-  }
+  };
 
   return {
     isGenerating,
-    generatePodcast
-  }
-
-}
+    generatePodcast,
+  };
+};
 
 const GeneratePodcast = (props: GeneratePodcastProps) => {
-
-  const { isGenerating, generatePodcast } = useGeneratePodcast(props)
+  const { isGenerating, generatePodcast } = useGeneratePodcast(props);
 
   return (
     <div>
-      <div className='flex flex-col gap-2.5'>
-        <Label className='text-16 font-bold text-white-1'>
+      <div className="flex flex-col gap-2.5">
+        <Label className="text-16 font-bold text-white-1">
           AI Prompt to generate podcast
         </Label>
 
         <Textarea
-          className=' input-class focus:ring-offset-orange-1'
-          placeholder='Write your prompt ...'
+          className=" input-class focus:ring-offset-orange-1"
+          placeholder="Write your prompt ..."
           rows={5}
           value={props.voicePrompt}
           onChange={(e) => props.setVoicePrompt(e.target.value)}
         />
-
       </div>
 
-      <div className='mt-5 w-full max-w-[200px] text-white-1 text-1 font-bold'>
+      <div className="mt-5 w-full max-w-[200px] text-black-1 text-1 font-bold">
         <Button
           type="submit"
-          className=" bg-orange-1 text-white-1 text-16 font-bold py-4"
+          className=" bg-orange-1 text-black-1 text-16 font-bold py-4"
           onClick={generatePodcast}
           disabled={isGenerating}
         >
@@ -106,11 +104,8 @@ const GeneratePodcast = (props: GeneratePodcastProps) => {
               <Loader size={20} className="animate-spin ml-2" />
             </>
           ) : (
-            <>
-              Generate
-            </>
+            <>Generate</>
           )}
-
         </Button>
       </div>
       {props.audio && (
@@ -118,12 +113,14 @@ const GeneratePodcast = (props: GeneratePodcastProps) => {
           controls
           src={props.audio}
           autoPlay
-          className='mt-5'
-          onLoadedMetadata={(e) => props.setAudioDuration(e.currentTarget.duration)}
+          className="mt-5"
+          onLoadedMetadata={(e) =>
+            props.setAudioDuration(e.currentTarget.duration)
+          }
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default GeneratePodcast
+export default GeneratePodcast;
