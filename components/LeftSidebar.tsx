@@ -22,8 +22,11 @@ const LeftSidebar = () => {
           href="/"
         >
           <Image src="/icons/logo.svg" width={23} height={27} alt="Logo" />
-          <h1 className="text-24 font-extrabold text-white max-lg:hidden">
-            Podcastr
+          <h1 className="text-24 font-extrabold text-orange-1 max-lg:hidden italic">
+            Ghost
+          </h1>
+          <h1 className="text-24 font-extrabold text-white max-lg:hidden italic">
+            Cast
           </h1>
         </Link>
 
@@ -47,15 +50,18 @@ const LeftSidebar = () => {
       </nav>
       <SignedOut>
         <div className="flex-center w-full pb-14 max-lg:px-4 lg:pr-8">
-          <Button asChild className="text-16 w-full bg-orange-1 font-extrabold">
+          <Button
+            asChild
+            className="text-16 w-full bg-orange-1 font-extrabold text-black-1"
+          >
             <Link href="/sign-in">Sign In</Link>
-          </Button >
+          </Button>
         </div>
       </SignedOut>
       <SignedIn>
         <div className="flex-center w-full pb-14 max-lg:px-4 lg:pr-8">
           <Button
-            className="text-16 w-full bg-orange-1 font-extrabold"
+            className="text-16 w-full bg-orange-1 font-extrabold text-black-1"
             onClick={() => signOut(() => router.push("/"))}
           >
             <Link href="/sign-in">Sign Out</Link>

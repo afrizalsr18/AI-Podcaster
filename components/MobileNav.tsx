@@ -33,8 +33,8 @@ const MobileNav = () => {
             className="flex cursor-pointer items-center gap-1 pb-10 pl-4"
           >
             <Image src="/icons/logo.svg" alt="logo" width={23} height={27} />
-            <h1 className="text-24 font-extrabold  text-white-1 ml-2">
-              Podcastr
+            <h1 className="text-24 font-extrabold italic text-white-1 ml-2">
+              GhostCast
             </h1>
           </Link>
           <div className="flex h-[calc(100vh-72px)] flex-col justify-between overflow-y-auto">
